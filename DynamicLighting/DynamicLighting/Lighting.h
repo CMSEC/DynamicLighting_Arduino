@@ -2,6 +2,8 @@
 #include "Adafruit_NeoPixel.h";
 #include "Colour.h";
 #include "Sequence.h";
+#include "LightInformation.h";
+#include "ESC.h";
 class Lighting : public Adafruit_NeoPixel
 {
 public:
@@ -53,7 +55,8 @@ public:
 		EFFECT_FLICKER,
 		EFFECT_BLOWOUT,
 		EFFECT_BOUNCYSPARKS,
-		EFFECT_SENSORDATA
+		EFFECT_SENSORDATA,
+		EFFECT_COMPUTER_BOOT
 	};
 
 //STATE - DEFINITIONS
@@ -92,8 +95,8 @@ public:
 	uint16_t effectIndex; //Current step within the TRANSITION
 
 
-	unsigned long Interval = 50; //Milliseconds between updates (DEFAULT IS 50 MILLISECONDS (0.05s) EVEN IF DURATIONS OR DELAYS ARE 25 MILLISECONDS THEY ROUND UP TO THE NEAREST 50 MILLISECONDS!)
-	unsigned long lastUpdate = 0; //Last update of position
+	unsigned long Interval; //INVALID: Milliseconds between updates (DEFAULT IS 50 MILLISECONDS (0.05s) EVEN IF DURATIONS OR DELAYS ARE 25 MILLISECONDS THEY ROUND UP TO THE NEAREST 50 MILLISECONDS!)
+	unsigned long lastUpdate; //Last update of position
 
 
 	uint16_t numPixels; //How many pixels are in the strip or array
@@ -106,12 +109,15 @@ public:
 	Sequence idleOverlay; //What the idle ques in to. Overlays or affects the display (state).
 	Sequence effectDisplay; //Chooses to completely take over, or simply overlay EVERYTHING.
 
+	LightInformation information;
+
 	void(*OnComplete)();
-	Lighting(uint16_t _pixels, uint8_t _pin, neoPixelType _type, void(*callback)()):Adafruit_NeoPixel(_pixels, _pin, _type)
+	Lighting(uint16_t _pixels, uint8_t _pin, neoPixelType _type, void(*callback)(), LightInformation _info):Adafruit_NeoPixel(_pixels, _pin, _type)
 	{
 		numPixels = _pixels; //REFERENCE - Theses variables are for reference, the NeoPixel class saves them elsewhere. These are what the states, transitions, idle, and effects use to judge duration
 		numPin = _pin; //REFERENCE - " "
 		OnComplete = callback; //REFERENCE - " "
+		information = _info;
 
 		display = Sequence(_pixels); //Creates linked lists that store the color of every individual pixel, others like next, idle, and effect are usually just modifiers of display
 		nextDisplay = Sequence(_pixels);
@@ -127,10 +133,16 @@ public:
 			switch (state)
 			{
 			case STATE_COLOR:
+				SolidColorUpdate();
 				break;
 			case STATE_DOWNLOAD:
+				DownloadUpdate();
+				break;
+			case STATE_UPLOAD:
+				UploadUpdate();
 				break;
 			case STATE_DISCO:
+				DiscoUpdate();
 				break;
 			case STATE_SHORTCIRCUIT:
 				break;
@@ -151,10 +163,167 @@ public:
 			}
 		}
 	}
+	void Increment()
+	{
+		if (reverse == false)
+		{
+			stateIndex++;
+			if (stateIndex >= stateTotalSteps)
+			{
+				stateIndex = 0;
+				if (OnComplete != NULL)
+				{
+					//OnComplete();
+				}
+			}
+		}
+		else
+		{
+			--stateIndex;
+			if (stateIndex <= 0)
+			{
+				stateIndex = stateTotalSteps - 1;
+				if (OnComplete != NULL)
+				{
+					//OnComplete();
+				}
+			}
+		}
+	}
+	void Reverse()
+	{
+		if (reverse == false)
+		{
+			reverse = true;
+			stateIndex = stateTotalSteps - 1;
+		}
+		else
+		{
+			reverse = false;
+			stateIndex = 0;
+		}
+	}
 
 
 
 
 //STATES - PROGRAMMING
+
+//COLOR
+	public:
+		void SolidColor(Colour color)
+		{
+
+		}
+	private:
+		void SolidColorUpdate()
+		{
+
+		}
+
+//DOWNLOAD
+	public:
+		void Download()
+		{
+
+		}
+	private:
+		void DownloadUpdate()
+		{
+
+		}
+
+//UPLOAD
+	public:
+		void Upload()
+		{
+
+		}
+	private:
+		void UploadUpdate()
+		{
+
+		}
+
+//DISCO
+	public:
+		void Disco(uint8_t interval, bool rev = false)
+		{
+			state = STATE_DISCO;
+			Interval = interval;
+			stateTotalSteps = 255;
+			stateIndex = 0;
+			reverse = rev;
+		}
+	private:
+		void DiscoUpdate()
+		{
+			for (int i = 0; i< numPixels; i++)
+			{
+				setPixelColor(i, Wheel(((i * 256 / numPixels) + stateIndex) & 255));
+			}
+			show();
+			Increment();
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//UTILITY FUNCTIONS
+	uint32_t DimColor(uint32_t color)
+	{
+		uint32_t dimColor = Color(Red(color) >> 1, Green(color) >> 1, Blue(color) >> 1);
+		return dimColor;
+	}
+	void ColorSet(uint32_t color)
+	{
+		for (int i = 0; i < numPixels; i++)
+		{
+			setPixelColor(i, color);
+		}
+		show();
+	}
+	uint8_t Red(uint32_t color)
+	{
+		return (color >> 16) & 0xFF;
+	}
+	uint8_t Green(uint32_t color)
+	{
+		return (color >> 8) & 0xFF;
+	}
+	uint8_t Blue(uint32_t color)
+	{
+		return color & 0xFF;
+	}
+	uint32_t Wheel(byte WheelPos)
+	{
+		WheelPos = 255 - WheelPos;
+		if (WheelPos < 85)
+		{
+			return Color(255 - WheelPos * 3, 0, WheelPos * 3);
+		}
+		else if (WheelPos < 170)
+		{
+			WheelPos -= 85;
+			return Color(0, WheelPos * 3, 255 - WheelPos * 3);
+		}
+		else
+		{
+			WheelPos -= 170;
+			return Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+		}
+	}
 };
 

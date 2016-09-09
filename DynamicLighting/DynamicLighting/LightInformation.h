@@ -1,20 +1,22 @@
 #pragma once
-
-class LightInformation
+namespace CMSEC
 {
-public:
-	LightInformation() {};
-	LightInformation(String _name)
+	class LightInformation
 	{
-		name = _name;
-	};
-	LightInformation(String _name, String _details)
-	{
-		name = _name;
-		details = _details;
-	};
-	~LightInformation() {};
+	public:
+		LightInformation() {};
+		LightInformation(String _name)
+		{
+			name = _name;
+		};
+		LightInformation(String _name, String _details)
+		{
+			name = _name;
+			details = _details;
+		};
+		~LightInformation() {};
 
-	String name;
-	String details;
-};
+		String name = "None";
+		String details = "No Details";
+	};
+}

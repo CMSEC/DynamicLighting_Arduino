@@ -17,4 +17,6 @@ C:\Users\Connor\AppData\Local\Temp\VMicroBuilds\DynamicLighting\mega_atmega2560\
  C:\Users\Connor\AppData\Local\Temp\VMicroBuilds\DynamicLighting\mega_atmega2560\Colour.h \
  C:\Users\Connor\AppData\Local\Temp\VMicroBuilds\DynamicLighting\mega_atmega2560\Sequence.h \
  C:\Users\Connor\AppData\Local\Temp\VMicroBuilds\DynamicLighting\mega_atmega2560\LightInformation.h \
+ C:\Users\Connor\AppData\Local\Temp\VMicroBuilds\DynamicLighting\mega_atmega2560\ESC.h \
+ C:\Users\Connor\AppData\Local\Temp\VMicroBuilds\DynamicLighting\mega_atmega2560\Configuration.h \
  C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\ 14.0\Common7\IDE\Extensions\axvazags.nlw\Micro\ Platforms\default\debuggers/VM_DBG/VM_DBG.h

@@ -1,49 +1,28 @@
 #pragma once
-class Sequence
+#include "Colour.h";
+namespace CMSEC
 {
-private:
-	struct Node
+	class Sequence
 	{
 	public:
-		Node() {};
-		Node(Colour _value)
+		Sequence()
 		{
-			value = _value;
-		};
-		~Node() {};
-
-		Node* previous;
-		Node* next;
-		Colour value;
-	};
-public:
-	Sequence() {}
-	Sequence(uint16_t _size)
-	{
-		for (uint16_t i = 0; i < _size; i++)
-		{
-			head = Insert(new Node(), Colour());
+			data = new Colour[0];
 		}
-	}
-	~Sequence() {};
+		Sequence(int16_t _size)
+		{
+			data = new Colour[_size];
+		}
 
-	Node* Insert(Node* _node, Colour _value)
-	{
-		if (_node == nullptr)
-			return Create(_value, _node);
-		_node->next = Insert(_node->next, _value);
-		return _node;
-	}
-	Node* Create(Colour _value, Node* _node = NULL)
-	{
-		Node* newNode = new Node(_value);
-		newNode->next = _node;
-		return newNode;
-	}
+		void Set(uint16_t _pixel, Colour _value)
+		{
+			data[_pixel] = _value;
+		}
+		Colour At(uint16_t _pixel)
+		{
+			return data[_pixel];
+		}
 
-	Node* root = NULL;
-	Node* head = NULL;
-	Node* current = NULL;
-	uint16_t count = 0;
-	//uint16_t location = 0;
-};
+		Colour* data;
+	};
+}
